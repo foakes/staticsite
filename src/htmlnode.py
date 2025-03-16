@@ -7,7 +7,7 @@ class HTMLNode:
 
     def to_html(self):
         raise NotImplementedError()
-    
+
     def props_to_html(self):
         props_str = ""
         props_dict = self.props.copy()
@@ -19,3 +19,18 @@ class HTMLNode:
         return f"HTMLNode({self.tag}, {self.value}, {self.children}, {self.props})"
     
 
+class LeafNode(HTMLNode):
+    def __init__(self, tag, value, props=None):
+        super().__init__(tag, value, None, props) # super() doesn't require self
+        # None is passed to the parent class __init__ for children
+
+    def to_html(self):
+        if not self.value: # raises exception if no value
+            raise ValueError("Leaf Nodes cannot be empty")
+        if not self.tag: # handles no tag
+            return f"{self.value}"
+        if not self.props: # handles leaf nodes with no props
+            return f"<{self.tag}>{self.value}</{self.tag}>"
+        else: # handles leaf nodes w/ props
+            return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
+    
