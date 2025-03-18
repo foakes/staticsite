@@ -9,6 +9,10 @@ class HTMLNode:
         raise NotImplementedError()
 
     def props_to_html(self):
+        if not self.props:
+            return ""
+        if not isinstance(self.props, dict):
+            raise TypeError("Props must be a dictionary")
         props_str = ""
         props_dict = self.props.copy()
         for k in props_dict:
@@ -34,3 +38,23 @@ class LeafNode(HTMLNode):
         else: # handles leaf nodes w/ props
             return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
     
+
+class ParentNode(HTMLNode):
+    def __init__(self, tag, children, props=None):
+        super().__init__(tag, None, children, props)
+
+    def to_html(self):
+        if not self.tag:
+            raise ValueError("Parent Node must contain tag")
+        if not self.children:
+            raise ValueError("Parent Node must contain children")
+        results = ""
+        for child in self.children:
+            if isinstance(child, LeafNode):
+                results += f"<{child.tag}>{child.value}</{child.tag}>"
+            elif isinstance(child, ParentNode):
+                #results += f"<{child.tag}>{child.to_html()}</{child.tag}>"
+                p_results = f"{child.to_html()}"
+                results += p_results
+        return f"<{self.tag}>{results}</{self.tag}>"
+
