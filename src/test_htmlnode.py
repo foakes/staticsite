@@ -104,5 +104,13 @@ class TestLeafNode(unittest.TestCase):
             "<div><span><b>neice</b><b>nephew</b></span></div>",
         )
 
+    def test_to_html_w_props(self):
+        child_node = LeafNode("a", "Click here", {"href": "www.boot.dev", "target": "_blank"})
+        parent_node = ParentNode("section", [child_node], {"class": "link-container"})
+        self.assertEqual(
+            parent_node.to_html(), 
+            '<section class="link-container"><a href="www.boot.dev" target="_blank">Click here</a></section>'
+        )
+
 if __name__ == "__main__":
     unittest.main()

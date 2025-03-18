@@ -49,12 +49,17 @@ class ParentNode(HTMLNode):
         if not self.children:
             raise ValueError("Parent Node must contain children")
         results = ""
+        # ***Forgot about polymorphism - I checked isinstance for the Nodes rather than relying on
+        #     each classes own personalized to_html function***
+        # for child in self.children:
+        #     if isinstance(child, LeafNode):
+        #         results += f"<{child.tag}>{child.value}</{child.tag}>"
+        #     elif isinstance(child, ParentNode):
+        #         #results += f"<{child.tag}>{child.to_html()}</{child.tag}>"
+        #         p_results = f"{child.to_html()}"
+        #         results += p_results
         for child in self.children:
-            if isinstance(child, LeafNode):
-                results += f"<{child.tag}>{child.value}</{child.tag}>"
-            elif isinstance(child, ParentNode):
-                #results += f"<{child.tag}>{child.to_html()}</{child.tag}>"
-                p_results = f"{child.to_html()}"
-                results += p_results
-        return f"<{self.tag}>{results}</{self.tag}>"
+            results += child.to_html()
+        #return f"<{self.tag}>{results}</{self.tag}>"
+        return f"<{self.tag}{self.props_to_html()}>{results}</{self.tag}>"
 
