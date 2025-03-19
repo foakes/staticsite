@@ -1,3 +1,6 @@
+from textnode import TextNode, TextType
+
+
 class HTMLNode:
     def __init__(self, tag=None, value=None, children=None, props=None):
         self.tag = tag
@@ -63,3 +66,26 @@ class ParentNode(HTMLNode):
         #return f"<{self.tag}>{results}</{self.tag}>"
         return f"<{self.tag}{self.props_to_html()}>{results}</{self.tag}>"
 
+
+def text_node_to_html_node(text_node):
+    if not isinstance(text_node, TextNode):
+        raise ValueError("input must be TextNode object")
+    if text_node.text_type not in TextType:
+        raise ValueError("please use a supported text type")
+    if text_node.text_type == TextType.TEXT: # evaluating enums based on Enum rather than the Enum value
+        node = LeafNode(None, text_node.text, None)
+    elif text_node.text_type == TextType.BOLD:
+        node = LeafNode("b", text_node.text, None)
+    elif text_node.text_type == TextType.ITALIC:
+        node = LeafNode("i", text_node.text, None)
+    elif text_node.text_type == TextType.CODE:
+        node = LeafNode("code", text_node.text, None)
+    elif text_node.text_type == TextType.LINK:
+        if not text_node.url:
+            raise ValueError("URL missing from link TextNode object")
+        node = LeafNode("a", text_node.text, {"href": text_node.url})
+    elif text_node.text_type == TextType.IMAGE:
+        if not text_node.url:
+            raise ValueError("Source image URL missing from image TextNode object")
+        node = LeafNode("img", "", {"src": text_node.url, "alt": text_node.text})
+    return node
