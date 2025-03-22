@@ -4,11 +4,18 @@ from extractors import extract_markdown_links, extract_markdown_images
 
 def split_nodes_image(old_nodes):
     new_nodes = []
+    counter = 0
     for old_node in old_nodes:
+        counter += 1
+        print(f"{old_node} @@@@@")
         if old_node.text_type != TextType.TEXT:
             new_nodes.append(old_node)
         else:
             image_tuple_list = extract_markdown_images(old_node.text)
+            
+    print(image_tuple_list)
+    print(counter)
+    print(new_nodes)
 
 
 
@@ -46,14 +53,19 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
             
             
     return new_nodes
-
-
-                             
-
-    
     #print(new_nodes)
 
-# node = TextNode("Bold Test", TextType.BOLD)
+
+linknode = TextNode(
+    "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)",
+      TextType.TEXT,
+        )
+imagenode = TextNode(
+        "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and another ![second image](https://i.imgur.com/3elNhQu.png)",
+        TextType.TEXT,
+    )
+
+split_nodes_image([imagenode])
 # split_nodes_delimiter(node, "**", TextType.BOLD)
 
 # node1 = TextNode("This **is** a test", TextType.TEXT)
