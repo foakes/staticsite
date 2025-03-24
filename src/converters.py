@@ -12,6 +12,10 @@ def split_nodes_image(old_nodes):
             new_nodes.append(old_node)
         else:
             image_tuple_list = extract_markdown_images(old_node.text)
+            for i in image_tuple_list:
+                splitter = i[0] + i[1]
+
+
             
     print(image_tuple_list)
     print(counter)
