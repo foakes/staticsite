@@ -12,8 +12,18 @@ def split_nodes_image(old_nodes):
             new_nodes.append(old_node)
         else:
             image_tuple_list = extract_markdown_images(old_node.text)
-            for i in image_tuple_list:
-                splitter = i[0] + i[1]
+            raw_text = old_node.text
+            split_text = raw_text.split("![")
+            if len(split_text) % 2 == 0:
+                new_nodes.append(TextNode(split_text[0], TextType.TEXT))
+                new_nodes.append(TextNode(image_tuple_list[0][0], TextType.LINK, image_tuple_list[0][1]))
+                final_split = split_text[1].split(")")
+                new_nodes.append(TextNode(final_split[1], TextType.TEXT))
+            else:
+                raise Exception("add support for more than 1 image")
+
+
+
 
 
             
@@ -68,8 +78,12 @@ imagenode = TextNode(
         "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and another ![second image](https://i.imgur.com/3elNhQu.png)",
         TextType.TEXT,
     )
+oneimagenode = TextNode(
+    "This is text with an ![image](https://i.imgur.com/dfkjsdd.png) of a bird",
+    TextType.TEXT,
+)
 
-split_nodes_image([imagenode])
+split_nodes_image([oneimagenode])
 # split_nodes_delimiter(node, "**", TextType.BOLD)
 
 # node1 = TextNode("This **is** a test", TextType.TEXT)
