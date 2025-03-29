@@ -4,32 +4,59 @@ from extractors import extract_markdown_links, extract_markdown_images
 
 def split_nodes_image(old_nodes):
     new_nodes = []
-    counter = 0
     for old_node in old_nodes:
-        counter += 1
-        print(f"{old_node} @@@@@")
         if old_node.text_type != TextType.TEXT:
             new_nodes.append(old_node)
         else:
             image_tuple_list = extract_markdown_images(old_node.text)
-            raw_text = old_node.text
-            split_text = raw_text.split("![")
-            if len(split_text) % 2 == 0:
-                new_nodes.append(TextNode(split_text[0], TextType.TEXT))
-                new_nodes.append(TextNode(image_tuple_list[0][0], TextType.LINK, image_tuple_list[0][1]))
-                final_split = split_text[1].split(")")
-                new_nodes.append(TextNode(final_split[1], TextType.TEXT))
+            original_text = old_node.text
+            for tup in image_tuple_list:
+                image_alt = tup[0]
+                image_link = tup[1]
+                sections = original_text.split(f"![{image_alt}]({image_link})", 1)
+                if len(sections) == 2:
+                    print("hit outer if")
+                    if sections[0] == "":
+                        print("hit inner if/if")
+                        continue
+                    else:
+                        print("hit inner if/else")
+                        new_nodes.append(TextNode(sections[0], TextType.TEXT))
+                    new_nodes.append(TextNode(image_alt, TextType.IMAGE, image_link))
+                    original_text = sections[1]
+                else:
+                    print("hit outer else")
+                    if sections[0] == "":
+                        print("hit inner else/if")
+                        continue
+                    else:
+                        print("hit inner else/else")
+                        new_nodes.append(TextNode(sections[0], TextType.TEXT))
+            if original_text != "":
+                new_nodes.append(TextNode(original_text, TextType.TEXT))
             else:
-                raise Exception("add support for more than 1 image")
+                continue
+    return new_nodes
+
+
+            # raw_text = old_node.text
+            # split_text = raw_text.split("![")
+            # if len(split_text) % 2 == 0:
+            #     new_nodes.append(TextNode(split_text[0], TextType.TEXT))
+            #     new_nodes.append(TextNode(image_tuple_list[0][0], TextType.LINK, image_tuple_list[0][1]))
+            #     final_split = split_text[1].split(")")
+            #     new_nodes.append(TextNode(final_split[1], TextType.TEXT))
+            # else:
+            #     raise Exception("add support for more than 1 image")
 
 
 
 
 
             
-    print(image_tuple_list)
-    print(counter)
-    print(new_nodes)
+    # print(image_tuple_list)
+    # print(counter)
+    # print(new_nodes)
 
 
 
@@ -69,6 +96,8 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
     return new_nodes
     #print(new_nodes)
 
+'''
+Some tests for Images/Links for convenience
 
 linknode = TextNode(
     "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)",
@@ -79,17 +108,18 @@ imagenode = TextNode(
         TextType.TEXT,
     )
 oneimagenode = TextNode(
-    "This is text with an ![image](https://i.imgur.com/dfkjsdd.png) of a bird",
+    "This is text with anxx ![image](https://i.imgur.com/dfkjsdd.png) of a bird",
     TextType.TEXT,
 )
 
-split_nodes_image([oneimagenode])
+print(split_nodes_image([imagenode]))
 # split_nodes_delimiter(node, "**", TextType.BOLD)
 
 # node1 = TextNode("This **is** a test", TextType.TEXT)
 # node2 = TextNode("This is **a** test", TextType.TEXT)
 # print(split_nodes_delimiter([node1, node2], "**", TextType.BOLD))
 
+'''
 
 # def split_nodes_delimiter(old_nodes, delimiter, text_type):
 #     converted = []
