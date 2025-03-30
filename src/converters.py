@@ -10,28 +10,19 @@ def split_nodes_image(old_nodes):
         else:
             image_tuple_list = extract_markdown_images(old_node.text)
             original_text = old_node.text
+            if len(image_tuple_list) == 0:
+                new_nodes.append(old_node)
+                continue
             for tup in image_tuple_list:
                 image_alt = tup[0]
                 image_link = tup[1]
                 sections = original_text.split(f"![{image_alt}]({image_link})", 1)
-                if len(sections) == 2:
-                    print("hit outer if")
-                    if sections[0] == "":
-                        print("hit inner if/if")
-                        continue
-                    else:
-                        print("hit inner if/else")
-                        new_nodes.append(TextNode(sections[0], TextType.TEXT))
-                    new_nodes.append(TextNode(image_alt, TextType.IMAGE, image_link))
-                    original_text = sections[1]
-                else:
-                    print("hit outer else")
-                    if sections[0] == "":
-                        print("hit inner else/if")
-                        continue
-                    else:
-                        print("hit inner else/else")
-                        new_nodes.append(TextNode(sections[0], TextType.TEXT))
+                if len(sections) != 2:
+                    raise ValueError("invalid markdown input for image")
+                if sections[0] != "":
+                    new_nodes.append(TextNode(sections[0], TextType.TEXT))
+                new_nodes.append(TextNode(image_alt, TextType.IMAGE, image_link))
+                original_text = sections[1]
             if original_text != "":
                 new_nodes.append(TextNode(original_text, TextType.TEXT))
             else:
@@ -39,15 +30,32 @@ def split_nodes_image(old_nodes):
     return new_nodes
 
 
-            # raw_text = old_node.text
-            # split_text = raw_text.split("![")
-            # if len(split_text) % 2 == 0:
-            #     new_nodes.append(TextNode(split_text[0], TextType.TEXT))
-            #     new_nodes.append(TextNode(image_tuple_list[0][0], TextType.LINK, image_tuple_list[0][1]))
-            #     final_split = split_text[1].split(")")
-            #     new_nodes.append(TextNode(final_split[1], TextType.TEXT))
-            # else:
-            #     raise Exception("add support for more than 1 image")
+def split_nodes_link(old_nodes):
+    new_nodes = []
+    for old_node in old_nodes:
+        if old_node.text_type != TextType.TEXT:
+            new_nodes.append(old_node)
+        else:
+            link_tuple_list = extract_markdown_links(old_node.text)
+            original_text = old_node.text
+            if len(link_tuple_list) == 0:
+                new_nodes.append(old_node)
+                continue
+            for tup in link_tuple_list:
+                link_text = tup[0]
+                link_url = tup[1]
+                sections = original_text.split(f"[{link_text}]({link_url})", 1)
+                if len(sections) != 2:
+                    raise ValueError("invalid markdown input for link")
+                if sections[0] != "":
+                    new_nodes.append(TextNode(sections[0], TextType.TEXT))
+                new_nodes.append(TextNode(link_text, TextType.LINK, link_url))
+                original_text = sections[1]
+            if original_text != "":
+                new_nodes.append(TextNode(original_text, TextType.TEXT))
+            else:
+                continue
+    return new_nodes
 
 
 
