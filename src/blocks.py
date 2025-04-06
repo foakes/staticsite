@@ -10,7 +10,7 @@ class BlockType(Enum):
     ORDERED_LIST = "ordered list"
 
 def block_to_block_type(markdown_block):
-    headings = ["#", "##", "###", "####", "#####", "######"]
+    headings = ["# ", "## ", "### ", "#### ", "##### ", "###### "]
     for heading in headings:
         if markdown_block.startswith(heading):
             return BlockType.HEADING
